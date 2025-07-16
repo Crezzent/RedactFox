@@ -1,0 +1,16 @@
+.censored-word {
+  background-color: #181818;
+  color: #181818;
+  border-radius: 3px;
+  padding: 0 2px;
+  transition: all 0.15s ease;
+}
+
+.censored-word:hover {
+  cursor: pointer;
+}
+
+.revealed-word {
+  background-color: transparent !important;
+  color: inherit !important;
+}
