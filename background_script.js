@@ -1,4 +1,23 @@
-let lastClickedElement;
+let censoredWordsCache = [];
+
+function updateCache() {
+  browser.storage.local.get('censoredWords').then(result => {
+    censoredWordsCache = result.censoredWords || [];
+    console.log('RedactFox Cache: Updated with', censoredWordsCache);
+  });
+}
+
+updateCache();
+
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'get-word-list') {
+    sendResponse(censoredWordsCache);
+  }
+
+  if (message.type === 'word-list-updated') {
+    updateCache();
+  }
+});
 
 browser.contextMenus.create({
   id: "un-censor",
@@ -6,6 +25,8 @@ browser.contextMenus.create({
   contexts: ["all"],
   documentUrlPatterns: ["<all_urls>"]
 });
+
+let lastClickedElement;
 
 browser.runtime.onMessage.addListener((message) => {
   if (message.type === 'censored-right-click') {

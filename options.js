@@ -24,11 +24,12 @@ form.addEventListener('submit', (e) => {
   if (newWord) {
     browser.storage.local.get('censoredWords').then(result => {
       const words = result.censoredWords || [];
-      if (!words.includes(newWord)) {
+      if (!words.map(w => w.toLowerCase()).includes(newWord.toLowerCase())) {
         words.push(newWord);
         browser.storage.local.set({ censoredWords: words }).then(() => {
-          loadWords();
           wordInput.value = '';
+          loadWords();
+          browser.runtime.sendMessage({ type: 'word-list-updated' });
         });
       }
     });
@@ -39,7 +40,10 @@ function removeWord(index) {
   browser.storage.local.get('censoredWords').then(result => {
     let words = result.censoredWords || [];
     words.splice(index, 1);
-    browser.storage.local.set({ censoredWords: words }).then(loadWords);
+    browser.storage.local.set({ censoredWords: words }).then(() => {
+        loadWords();
+        browser.runtime.sendMessage({ type: 'word-list-updated' });
+    });
   });
 }
 
